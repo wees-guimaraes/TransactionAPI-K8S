@@ -6,20 +6,9 @@ metadata:
     name: mongodb
 spec:
   replicas: 3
-  serviceName: mongodb-sts-h
   selector:
     matchLabels:
       app: mongodb
-  volumeClaimTemplates:
-    - metadata:
-        name: db-storage
-      spec:
-        storageClassName: standard
-        accessModes:
-          - "ReadWriteOnce"
-        resources:
-          requests:
-            storage: 1Gi
   template:
     metadata:
       labels:
@@ -34,3 +23,8 @@ spec:
           volumeMounts:
             - mountPath: /data/db
               name: db-storage
+      volumes:
+        - name: db-storage
+          emptyDir:
+            medium: Memory
+  
