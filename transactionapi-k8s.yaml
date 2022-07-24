@@ -1,0 +1,97 @@
+## StatefulSet Mongodb
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+spec:
+  serviceName: mongodb-sts-h
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mongodb
+  volumeClaimTemplates:
+    - metadata:
+        name: db-storage
+      spec:
+        storageClassName: standard
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: 1Gi
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+        - name: mongodb-container
+          image: mongo
+          ports:
+            - containerPort: 27017
+              name: mongodb
+          volumeMounts:
+            - mountPath: /data/db
+              name: db-storage
+---
+################################################################
+## Service Mongodb Handless
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-h
+  labels:
+    version: v1
+    app: mongodb
+spec:
+  selector:
+    app: mongodb
+  type: ClusterIP
+  ports:
+    - name: mongodb
+      port: 27017
+      targetPort: 27017
+      protocol: TCP
+---
+################################################################
+## Deployment Transactionapi
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transaction-api
+  labels:
+    app: transaction-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: transaction-api
+  template:
+    metadata:
+      labels:
+        app: "transaction-api"
+    spec:
+      containers:
+      - name: transaction-api
+        image: "wesleyguimaraes/transactionsapi"
+        ports:
+          - containerPort: 8080
+        env:
+        - name: "SPRING_DATASOURCE_URL"
+          value: "mongodb://mongodb-h:27017/transactiondb"
+---
+################################################################
+## Service transactionApi
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-svc
+spec:
+  selector:
+    app: transaction-api
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 32002
+  type: NodePort
