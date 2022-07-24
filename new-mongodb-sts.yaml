@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+  labels:
+    name: mongodb
+spec:
+  replicas: 3
+  serviceName: mongodb-sts-h
+  selector:
+    matchLabels:
+      app: mongodb
+  volumeClaimTemplates:
+    - metadata:
+        name: db-storage
+      spec:
+        storageClassName: standard
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: 1Gi
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+        - name: mongodb-container
+          image: mongo
+          ports:
+          - name: mongo
+            containerPort: 27017
+          volumeMounts:
+            - mountPath: /data/db
+              name: db-storage
