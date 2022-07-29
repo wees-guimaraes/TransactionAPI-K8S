@@ -7,7 +7,7 @@
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 </div>
 
-# FIAP Container & Virtualization - Kubernetes
+# FIAP Container & Virtualization - Ambiente de Alta Disponibilidade
 
 ### Imagem docker do microserviço no docker hub:
 
